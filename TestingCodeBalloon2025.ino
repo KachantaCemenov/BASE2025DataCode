@@ -90,7 +90,7 @@ void setup() {
     //filename = "DATA20220628.csv";
     //filename = "20220628DATA.csv";
     
-    filename = "TEST2.csv";
+    filename = "FLI01.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
@@ -139,7 +139,7 @@ void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, floa
  *   saveData() function.
  */
 void loop() {
-    if(millis()%30000==0) //60,000 can be changed as needed 
+    if(millis()%3000==0) //60,000 can be changed as needed 
     {
         
         if(P_Sens.readDigitalValue())
