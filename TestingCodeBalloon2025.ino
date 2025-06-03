@@ -54,13 +54,13 @@ void setup() {
 
     Serial.begin(9600); //9600 can be adjusted as needed
 
-    /* //Omit this because there are no Geiger counters present
+     //Omit this because there are no Geiger counters present
     for(int g=28; g<34; g+=2)
     {
         pinMode(g, INPUT);
         Serial.print("Pin mapped as INPUT: "); Serial.println(g);
     }
-    */
+    
 
     pinMode(smokeInput, INPUT);
     Serial.print("Pin mapped as INPUT: "); Serial.println(smokeInput);
@@ -169,13 +169,13 @@ void loop() {
         Serial.print("Altitude    :  ");
         Serial.print(alt);
         Serial.println(" meter");
-        /*
+        
         Serial.print("count1: "); Serial.println(count1);
         Serial.print("count2: "); Serial.println(count2);
         Serial.print("count3: "); Serial.println(count3);
         Serial.print("count12: "); Serial.println(count12);
         Serial.print("count13: "); Serial.println(count13);
-        */
+        
 
         
         Serial.print("Max gas concentration: "); Serial.println(maxSmokeData);
@@ -185,13 +185,13 @@ void loop() {
 
         saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt, avgSmokeData, maxSmokeData);
         dataTag += 1;
-        /*
+        
         count1 = 0; //Middle
         count2 = 0; //Side
         count3 = 0; //Top
         count12 = 0; //Horizontal
         count13 = 0; //Vertical    
-        */
+        
         
         maxSmokeData = 0;
         avgSmokeData = 0;
@@ -208,7 +208,7 @@ void loop() {
     }
     
     
-    /*
+    
     int value1 = digitalRead(28); //middle 
     int value2 = digitalRead(30); //side
     int value3 = digitalRead(32); //top 
@@ -236,7 +236,7 @@ void loop() {
             count3++;
         }
     } 
-    */
+    
 
 
 }
