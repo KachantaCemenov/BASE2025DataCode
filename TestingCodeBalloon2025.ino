@@ -13,7 +13,7 @@
  *   counters, for coincidences, and for use in the loop; then
  *   initializing SD-related variables.
  */
- #include <Wire.h>
+
 #include <SPI.h>
 #include <SD.h>
 #include <MS5607.h> //Includes the library of the pressure sensor from https://github.com/UravuLabs/MS5607
@@ -90,7 +90,7 @@ void setup() {
     //filename = "DATA20220628.csv";
     //filename = "20220628DATA.csv";
     
-    filename = "TEST.csv";
+    filename = "FLI01.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
@@ -139,12 +139,13 @@ void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, floa
  *   saveData() function.
  */
 void loop() {
-    if(millis()%5000==0) //60,000 can be changed as needed 
+    if(millis()%3000==0) //60,000 can be changed as needed 
     {
         
         if(P_Sens.readDigitalValue())
         {
             temp = P_Sens.getTemperature();
+            temp += 273.15; //Conver Celcius to Kelvin
             pres = P_Sens.getPressure();
             alt = P_Sens.getAltitude();
         }
@@ -162,7 +163,7 @@ void loop() {
         Serial.println("==================================================");
         Serial.print("Temperature :  ");
         Serial.print(temp);
-        Serial.println(" C");
+        Serial.println(" C"); //CHANGE TO KELVIN
         Serial.print("Pressure    :  ");
         Serial.print(pres);
         Serial.println(" mBar");
