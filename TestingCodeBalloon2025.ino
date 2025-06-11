@@ -43,8 +43,8 @@ float avgSmokeData = 0;
 
 ADXL345 adxl = ADXL345();
 float X_out, Y_out, Z_out;
-float roll, pitch, rollF, pitchF = -90;
-float maxRoll, avgRoll, maxPitch, avgPitch = -90;
+float roll, pitch, rollF, pitchF = 0;
+float maxRoll, avgRoll, maxPitch, avgPitch = 0;
 
 File myFile;
 String filename;
@@ -221,8 +221,8 @@ void loop() {
         avgSmokeData = 0;
         secondDataCount = 0;
 
-        maxRoll = -90; avgRoll = -90;
-        maxPitch = -90; avgPitch = -90;
+        maxRoll = 0; avgRoll = 0;
+        maxPitch = 0; avgPitch = 0;
     }
     
     if(millis()%1000==0) //Every second
@@ -248,8 +248,17 @@ void loop() {
         // Low-pass filter
         rollF = 0.94 * rollF + 0.06 * roll;
         pitchF = 0.94 * pitchF + 0.06 * pitch;
-  
-        maxRoll = max(maxRoll, rollF); maxPitch = max(maxPitch, pitchF);
+
+        //Compare absolute value because roll, pitch can be negative
+        if (abs(maxRoll) < abs(rollF))
+        {
+            maxRoll = rollF;
+        }
+        if (abs(maxPitch) < abs(pitchF))
+        {
+            maxPitch = pitchF;
+        }
+
         avgRoll += rollF; avgPitch += pitchF;
 
         secondDataCount++;
