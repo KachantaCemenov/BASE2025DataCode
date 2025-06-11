@@ -42,5 +42,4 @@ void loop() {
   Serial.print(rollF);
   Serial.print(" / ");
   Serial.println(pitchF);
-  
 }

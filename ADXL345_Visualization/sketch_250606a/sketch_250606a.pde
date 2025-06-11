@@ -16,6 +16,7 @@ float roll, pitch;
 void setup() {
   size (960, 640, P3D);
   myPort = new Serial(this, "COM5", 9600); // starts the serial communication
+
   myPort.bufferUntil('\n');
 }
 

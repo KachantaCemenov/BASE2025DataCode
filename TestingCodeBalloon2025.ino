@@ -176,7 +176,7 @@ void loop() {
         Serial.println("==================================================");
         Serial.print("Temperature :  ");
         Serial.print(temp);
-        Serial.println(" K"); 
+        Serial.println(" K");
         Serial.print("Pressure    :  ");
         Serial.print(pres);
         Serial.println(" mBar");
