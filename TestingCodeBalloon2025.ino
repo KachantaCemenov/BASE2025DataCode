@@ -83,7 +83,7 @@ void setup() {
     //preparing the MS5607 sensor
     if(!P_Sens.begin())
     {
-        Serial.println("Error in Communicating with sensor, check your connections!");
+        Serial.println("Error in Communicating with sensor MS5607, check your connections!");
     }else{
     Serial.println("MS5607 initialization successful!");
     }
@@ -91,6 +91,7 @@ void setup() {
     //Prepare the ADXL345 accelerometer
     adxl.powerOn();
     adxl.setRangeSetting(2);
+    Serial.println("ADXL345 initialized");
    
     
     //filename = "DATA202.csv";
