@@ -18,6 +18,7 @@
 #include <SD.h>
 #include <MS5607.h> //Includes the library of the pressure sensor from https://github.com/UravuLabs/MS5607
 #include <SparkFun_ADXL345.h>
+#include <LoRa.h>
 
 int dataTag = 0;
 
@@ -109,6 +110,15 @@ void setup() {
     else
     {
         return;
+    }
+
+    if (!LoRa.begin(915E6))
+    {
+        Serial.println("Starting LoRa failed!");
+    }
+    else
+    {
+        Serial.println("LoRa started.");
     }
     
 }
@@ -207,6 +217,12 @@ void loop() {
         avgPitch = avgPitch/secondDataCount;
         Serial.print("Average roll: "); Serial.println(avgRoll);
         Serial.print("Average pitch: "); Serial.println(avgPitch);
+
+        //Sending data through LoRa
+        LoRa.beginPacket();
+        LoRa.print("Hello from Arduino MEGA connected to Tri's laptop.");
+        LoRa.endPacket();
+        Serial.println("Packet sent through LoRa");
 
         saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt, avgSmokeData, maxSmokeData, avgRoll, maxRoll, avgPitch, maxPitch);
         dataTag += 1;
