@@ -4,7 +4,7 @@
 // Pause between transmited packets in seconds.
 // Set to zero to only transmit a packet when pressing the user button
 // Will not exceed 1% duty cycle, even if you set a lower value.
-#define PAUSE               300
+#define PAUSE               5
 
 // Frequency in MHz. Keep the decimal point to designate float.
 // Check your own rules and regulations to see what is legal where you are.
@@ -25,17 +25,16 @@
 // transmissting without an antenna can damage your hardware.
 #define TRANSMIT_POWER      0
 
-String rxdata;
-volatile bool rxFlag = false;
+String txdata;
 long counter = 0;
+uint64_t last_tx = 0;
+uint64_t tx_time;
+uint64_t minimum_pause;
 
 void setup() {
   heltec_setup();
   both.println("Radio init");
   RADIOLIB_OR_HALT(radio.begin());
-  // Set the callback function for received packets
-  radio.setDio1Action(rx);
-  // Set radio parameters
   both.printf("Frequency: %.2f MHz\n", FREQUENCY);
   RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
   both.printf("Bandwidth: %.1f kHz\n", BANDWIDTH);
@@ -44,27 +43,28 @@ void setup() {
   RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
   both.printf("TX power: %i dBm\n", TRANSMIT_POWER);
   RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
-  // Start receiving
-  RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
+  txdata = "This message is being sent from the LoRa with high antenna. Number: ";
 }
 
 void loop() {
   heltec_loop();
-
-  // If a packet was received, display it and the RSSI and SNR
-  if (rxFlag) {
-    rxFlag = false;
-    radio.readData(rxdata);
+  
+  bool tx_legal = millis() > last_tx + minimum_pause;
+  if ((PAUSE && tx_legal && millis() - last_tx > (PAUSE * 1000))) {
+    
+    radio.clearDio1Action();
+    tx_time = millis();
+    RADIOLIB(radio.transmit((txdata+String(counter++)).c_str()));
+    tx_time = millis() - tx_time;
     if (_radiolib_status == RADIOLIB_ERR_NONE) {
-      both.printf("RX [%s]\n", rxdata.c_str());
-      both.printf("  RSSI: %.2f dBm\n", radio.getRSSI());
-      both.printf("  SNR: %.2f dB\n", radio.getSNR());
+      both.printf("Transmitted: (%i)\n", (int)tx_time);
+    } else {
+      both.printf("Transmition failed (%i)\n", _radiolib_status);
     }
-    RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
+    // Maximum 1% duty cycle
+    minimum_pause = tx_time * 100;
+    last_tx = millis();
   }
+
 }
 
-// Can't do Serial or display things here, takes too much time for the interrupt
-void rx() {
-  rxFlag = true;
-}

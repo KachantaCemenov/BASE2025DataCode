@@ -1,24 +1,8 @@
 
-/*
- * Balloon Data Analysis - Version 170627
- * By Zach Wilkerson
- * Summer 2017
- * Edited by Ian Kuhl Summer 2022 to add a MS5607 pressure sensor and its relevent data.
- * 
- * This application is designed to take data input from three
- *   Sparkfun Geiger counters and save them on a per minute basis
- *   to an interfaced SD card.
- *
- * Initialization of count variables for each of the Geiger
- *   counters, for coincidences, and for use in the loop; then
- *   initializing SD-related variables.
- */
+#include <SD.h>
 
 #include <SPI.h>
-#include <SD.h>
-#include <MS5607.h> //Includes the library of the pressure sensor from https://github.com/UravuLabs/MS5607
-#include <SparkFun_ADXL345.h>
-
+#include <MS5607.h> 
 
 int dataTag = 0;
 
@@ -35,30 +19,10 @@ float temp;
 float pres;
 float alt;
 
-/*
-//Input pin for MQ-9 gas sensor
-int smokeInput = A1;
-int smokeData;
-int maxSmokeData = 0;
-float avgSmokeData = 0;
-*/
-
-int secondCount = 0;
-ADXL345 adxl = ADXL345();
-float X_out, Y_out, Z_out;
-float roll, pitch, rollF, pitchF = 0;
-float maxRoll, avgRoll, maxPitch, avgPitch = 0;
-
 File myFile;
 String filename;
 MS5607 P_Sens;
 
-// 11 12 13
-/*
- * void setup() prepares the pins for data reception and
- *   transmission, and then it readies the arduino for serial
- *   data transfer.
- */
 void setup() {
 
     Serial.begin(9600); 
@@ -69,11 +33,7 @@ void setup() {
         Serial.print("Pin mapped as INPUT: "); Serial.println(g);
     }
     
-    /*
-    pinMode(smokeInput, INPUT);
-    Serial.print("Pin mapped as INPUT: "); Serial.println(smokeInput);
-    */
-
+    
     //preparing the SD card:
     if(!SD.begin(10))
     {
@@ -84,6 +44,7 @@ void setup() {
         Serial.println("SD card detected.");
     }
     
+    
     //preparing the MS5607 sensor
     if(!P_Sens.begin())
     {
@@ -91,11 +52,13 @@ void setup() {
     }else{
     Serial.println("MS5607 initialization successful!");
     }
-
+    
+    /*
     //Prepare the ADXL345 accelerometer
     adxl.powerOn();
     adxl.setRangeSetting(2);
     Serial.println("ADXL345 initialized");
+    */
    
     
     //filename = "DATA202.csv";
@@ -103,17 +66,17 @@ void setup() {
     //filename = "DATA20220628.csv";
     //filename = "20220628DATA.csv";
     
-    filename = "TEST_03.csv";
+    filename = "TEST_01.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
     {
-        myFile.println("dataTag,Middle,Side,Top,Horizontal,Vertical,Pressure (mBar),Temperature (C),Altitude (m), Average Roll, Max Roll, Average Pitch, Max Pitch");
+        myFile.println("dataTag,Middle,Side,Top,Horizontal,Vertical,Pressure (mBar),Temperature (C),Altitude (m)");
         myFile.close();
     }
     else
     {
-        
+        myFile.close();
         return;
     }
     
@@ -137,19 +100,18 @@ void setup() {
     avgPitch = k
     maxPitch = l
 */
-void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, float h, float i, float o, float k, float l){
+void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, float h){
   myFile = SD.open(filename, FILE_WRITE);
   if(myFile)
   {
-    myFile.println(String(foo)+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","
-        +String(p)+","+String(t)+","+String(h)+","+String(i)+","+String(o)+","+String(k)+","+String(l));
+    myFile.println(String(foo)+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","+String(p)+","+String(t)+","+String(h));
     myFile.close();
-    
     Serial.println("Data recorded.");
   }
   else
   {
     Serial.println("Unable to recorded.");
+    myFile.close();
     return;
   }
 }
@@ -160,9 +122,8 @@ void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, floa
  *   saveData() function.
  */
 void loop() {
-    if(millis()%30000==0) 
+    if(millis()%5000==0) 
     {
-        
         if(P_Sens.readDigitalValue())
         {
             temp = P_Sens.getTemperature();
@@ -174,13 +135,6 @@ void loop() {
         {
             Serial.println("Error in reading digital value in sensor!");
         }
-        
-        
-        /*
-        temp = 0;
-        pres = 0;
-        alt = 0;
-        */
         
         Serial.println("==================================================");
         Serial.print("Temperature :  ");
@@ -199,26 +153,18 @@ void loop() {
         Serial.print("count12: "); Serial.println(count12);
         Serial.print("count13: "); Serial.println(count13);
 
-        
-
         /*
-        Serial.print("Max gas concentration: "); Serial.println(maxSmokeData);
-        //Calculate avgSmokeData
-        avgSmokeData = avgSmokeData/secondCount;
-        Serial.print("Average gas concentration: "); Serial.println(avgSmokeData);
-        */
-        
-        avgRoll = avgRoll/secondCount;
-        avgPitch = avgPitch/secondCount;
-
         Serial.print("Max Roll: "); Serial.println(maxRoll);
         Serial.print("Max Pitch: "); Serial.println(maxPitch);
+        
+        avgRoll = avgRoll/secondDataCount;
+        avgPitch = avgPitch/secondDataCount;
+        
         Serial.print("Average roll: "); Serial.println(avgRoll);
         Serial.print("Average pitch: "); Serial.println(avgPitch);
+        */
 
-
-
-        saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt, avgRoll, maxRoll, avgPitch, maxPitch);
+        saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt);
         dataTag += 1;
         
         count1 = 0; //Middle
@@ -228,25 +174,20 @@ void loop() {
         count13 = 0; //Vertical    
         
         /*
-        maxSmokeData = 0;
-        avgSmokeData = 0;
-        */
-        secondCount = 0;
-        
-
         maxRoll = 0; avgRoll = 0;
         maxPitch = 0; avgPitch = 0;
+        */
     }
-    
+    /*
     if(millis()%1000==0) //Every second
     {
-        /*
+        
         smokeData = analogRead(smokeInput); 
         maxSmokeData = max(smokeData,maxSmokeData);
 
         //Make avgSmokeData the sum of gas concentration in 30s
         avgSmokeData += smokeData;
-        */
+        
 
         int x,y,z;   
         adxl.readAccel(&x, &y, &z);
@@ -274,8 +215,9 @@ void loop() {
 
         avgRoll += rollF; avgPitch += pitchF;
 
-        secondCount++;
+        secondDataCount++;
     }
+    */
     
     
     int value1 = digitalRead(28); //middle 
