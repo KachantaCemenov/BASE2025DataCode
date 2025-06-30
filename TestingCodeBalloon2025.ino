@@ -19,8 +19,12 @@
 #include <MS5607.h> //Includes the library of the pressure sensor from https://github.com/UravuLabs/MS5607
 #include <SparkFun_ADXL345.h>
 
+#include <RTClib.h>
 
-int dataTag = 0;
+RTC_Millis rtc;
+
+
+String dataTag;
 
 //The counts are for geiger counters. 
 int count1 = 0;
@@ -62,12 +66,12 @@ MS5607 P_Sens;
 void setup() {
 
     Serial.begin(9600); 
+    rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
 
-    for(int g=28; g<34; g+=2)
-    {
-        pinMode(g, INPUT);
-        Serial.print("Pin mapped as INPUT: "); Serial.println(g);
-    }
+
+    pinMode(22, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(22);
+    pinMode(24, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(24);
+    pinMode(26, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(26);
     
     /*
     pinMode(smokeInput, INPUT);
@@ -103,7 +107,7 @@ void setup() {
     //filename = "DATA20220628.csv";
     //filename = "20220628DATA.csv";
     
-    filename = "TEST_03.csv";
+    filename = "TEST_04.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
@@ -137,11 +141,11 @@ void setup() {
     avgPitch = k
     maxPitch = l
 */
-void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, float h, float i, float o, float k, float l){
+void saveData(String foo, int a, int b, int c, int d, int e, float p, float t, float h, float i, float o, float k, float l){
   myFile = SD.open(filename, FILE_WRITE);
   if(myFile)
   {
-    myFile.println(String(foo)+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","
+    myFile.println(foo+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","
         +String(p)+","+String(t)+","+String(h)+","+String(i)+","+String(o)+","+String(k)+","+String(l));
     myFile.close();
     
@@ -160,8 +164,10 @@ void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, floa
  *   saveData() function.
  */
 void loop() {
-    if(millis()%30000==0) 
+    if(millis()%5000==0) 
     {
+        DateTime now = rtc.now();
+        dataTag = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
         
         if(P_Sens.readDigitalValue())
         {
@@ -219,7 +225,6 @@ void loop() {
 
 
         saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt, avgRoll, maxRoll, avgPitch, maxPitch);
-        dataTag += 1;
         
         count1 = 0; //Middle
         count2 = 0; //Side
@@ -278,9 +283,9 @@ void loop() {
     }
     
     
-    int value1 = digitalRead(28); //middle 
-    int value2 = digitalRead(30); //side
-    int value3 = digitalRead(32); //top 
+    int value1 = digitalRead(22); //middle 
+    int value2 = digitalRead(24); //side
+    int value3 = digitalRead(26); //top 
 
     if(value1==1 || value2==1 || value3==1)
     {
