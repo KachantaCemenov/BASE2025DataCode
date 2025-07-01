@@ -1,10 +1,6 @@
 
 #include <heltec_unofficial.h>
 
-// Pause between transmited packets in seconds.
-// Set to zero to only transmit a packet when pressing the user button
-// Will not exceed 1% duty cycle, even if you set a lower value.
-#define PAUSE               300
 
 // Frequency in MHz. Keep the decimal point to designate float.
 // Check your own rules and regulations to see what is legal where you are.
@@ -57,10 +53,7 @@ void loop() {
     radio.readData(rxdata);
     if (_radiolib_status == RADIOLIB_ERR_NONE) {
       both.printf("RX [%s]\n", rxdata.c_str());
-      both.printf("  RSSI: %.2f dBm\n", radio.getRSSI());
-      both.printf("  SNR: %.2f dB\n", radio.getSNR());
     }
-    RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
   }
 }
 
