@@ -1,8 +1,8 @@
 void setup() {
   // Initialize Serial for debugging
-  Serial.begin(9600);
+  Serial.begin(115200);
   
-  Serial1.begin(9600);
+  Serial1.begin(115200);
   
   Serial.println("Arduino Mega Serial2 initialized");
 }

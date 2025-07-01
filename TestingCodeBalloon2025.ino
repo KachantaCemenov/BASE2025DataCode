@@ -164,10 +164,10 @@ void saveData(String foo, int a, int b, int c, int d, int e, float p, float t, f
  *   saveData() function.
  */
 void loop() {
-    if(millis()%5000==0) 
+    if(millis()%60000==0) 
     {
         DateTime now = rtc.now();
-        dataTag = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
+        dataTag = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute());
         
         if(P_Sens.readDigitalValue())
         {
@@ -189,6 +189,7 @@ void loop() {
         */
         
         Serial.println("==================================================");
+        Serial.println(dataTag);
         Serial.print("Temperature :  ");
         Serial.print(temp);
         Serial.println(" K");
