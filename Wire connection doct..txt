@@ -1,0 +1,31 @@
+SD Shield - MEGA
+11 - 51 (blue)
+12 - 50 (yellow)
+13 - 52 (black)
+
+Geiger counts:
+Middle - Side - Top
+22 - 24 - 26
+
+Geiger power:
+Blue is 5V
+Red is GND
+
+Altimeter:
+Red - 3V3
+Dirt color - GND
+Gray - SCL
+Magenta - SDA
+
+Accelerometer:
+Orange - 5V
+Brown - GND
+Green - SCL
+White - SDA
+
+LORA:
+
+Red: RX (LoRa) - 19 TX (MEGA)
+Yellow: TX (LoRa) - 18 RX (MEGA)
+Another Yellow (next to Black): 5V
+Black: GND

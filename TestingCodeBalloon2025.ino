@@ -18,13 +18,13 @@
 #include <SD.h>
 #include <MS5607.h> //Includes the library of the pressure sensor from https://github.com/UravuLabs/MS5607
 #include <SparkFun_ADXL345.h>
-
+/*
 #include <RTClib.h>
 
 RTC_Millis rtc;
+*/
 
-
-String dataTag;
+int dataTag;
 
 //The counts are for geiger counters. 
 int count1 = 0;
@@ -65,8 +65,9 @@ MS5607 P_Sens;
  */
 void setup() {
 
-    Serial.begin(9600); 
-    rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
+    Serial.begin(115200);      // For serial monitor (USB)
+    Serial1.begin(115200);     // UART1: Mega <-> Heltec
+    //rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
 
 
     pinMode(22, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(22);
@@ -102,17 +103,13 @@ void setup() {
     Serial.println("ADXL345 initialized");
    
     
-    //filename = "DATA202.csv";
-    //filename = "20220628.csv";  
-    //filename = "DATA20220628.csv";
-    //filename = "20220628DATA.csv";
-    
-    filename = "TEST_04.csv";
+    //filename = "ROOF0703.csv";
+    filename = "FLI02.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
     {
-        myFile.println("dataTag,Middle,Side,Top,Horizontal,Vertical,Pressure (mBar),Temperature (C),Altitude (m), Average Roll, Max Roll, Average Pitch, Max Pitch");
+        myFile.println("dataTag,Middle,Side,Top,Horizontal,Vertical,Pressure (mBar),Temperature (K),Altitude (m), Average Roll, Max Roll, Average Pitch, Max Pitch");
         myFile.close();
     }
     else
@@ -141,11 +138,12 @@ void setup() {
     avgPitch = k
     maxPitch = l
 */
-void saveData(String foo, int a, int b, int c, int d, int e, float p, float t, float h, float i, float o, float k, float l){
+void saveData(int foo, int a, int b, int c, int d, int e, float p, float t, float h, float i, float o, float k, float l){
+  
   myFile = SD.open(filename, FILE_WRITE);
   if(myFile)
   {
-    myFile.println(foo+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","
+    myFile.println(String(foo)+","+String(a)+","+String(b)+","+String(c)+","+String(d)+","+String(e)+","
         +String(p)+","+String(t)+","+String(h)+","+String(i)+","+String(o)+","+String(k)+","+String(l));
     myFile.close();
     
@@ -163,11 +161,14 @@ void saveData(String foo, int a, int b, int c, int d, int e, float p, float t, f
  *   counters and pressure sensor and packages data as needed for processing via the
  *   saveData() function.
  */
+ long lastMinute = 0;
+ long lastSecond = 0;
 void loop() {
-    if(millis()%60000==0) 
+    
+    if(millis()-lastMinute >= 60000) 
     {
-        DateTime now = rtc.now();
-        dataTag = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute());
+        //DateTime now = rtc.now();
+        //dataTag = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute());
         
         if(P_Sens.readDigitalValue())
         {
@@ -226,7 +227,8 @@ void loop() {
 
 
         saveData(dataTag, count1, count2, count3, count12, count13, pres, temp, alt, avgRoll, maxRoll, avgPitch, maxPitch);
-        
+        Serial1.println(String(count1)+","+String(count2)+","+String(count3)+","+String(count12)+","+String(count13)+","
+            +String(pres)+","+String(temp)+","+String(alt)+","+String(avgRoll)+","+String(maxRoll)+","+String(avgPitch)+","+String(maxPitch));
         count1 = 0; //Middle
         count2 = 0; //Side
         count3 = 0; //Top
@@ -242,9 +244,12 @@ void loop() {
 
         maxRoll = 0; avgRoll = 0;
         maxPitch = 0; avgPitch = 0;
+
+        dataTag++;
+        lastMinute = millis();
     }
     
-    if(millis()%1000==0) //Every second
+    if(millis() - lastSecond >= 1000) //Every second
     {
         /*
         smokeData = analogRead(smokeInput); 
@@ -256,7 +261,7 @@ void loop() {
 
         int x,y,z;   
         adxl.readAccel(&x, &y, &z);
-  
+
         X_out = float(x)/256;
         Y_out = float(y)/256;
         Z_out = float(z)/256;
@@ -281,6 +286,7 @@ void loop() {
         avgRoll += rollF; avgPitch += pitchF;
 
         secondCount++;
+        lastSecond = millis();
     }
     
     

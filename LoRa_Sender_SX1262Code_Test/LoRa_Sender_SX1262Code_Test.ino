@@ -1,11 +1,11 @@
 
 #include <heltec_unofficial.h>
-
+/*
 // Pause between transmited packets in seconds.
 // Set to zero to only transmit a packet when pressing the user button
 // Will not exceed 1% duty cycle, even if you set a lower value.
 #define PAUSE               5
-
+*/
 // Frequency in MHz. Keep the decimal point to designate float.
 // Check your own rules and regulations to see what is legal where you are.
 //#define FREQUENCY           866.3       // for Europe
@@ -26,10 +26,6 @@
 #define TRANSMIT_POWER      0
 
 String txdata;
-long counter = 0;
-uint64_t last_tx = 0;
-uint64_t tx_time;
-uint64_t minimum_pause;
 
 void setup() {
   heltec_setup();
@@ -43,12 +39,26 @@ void setup() {
   RADIOLIB_OR_HALT(radio.setSpreadingFactor(SPREADING_FACTOR));
   both.printf("TX power: %i dBm\n", TRANSMIT_POWER);
   RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
-  txdata = "This message is being sent from the LoRa with high antenna. Number: ";
+  //txdata = "This message is being sent from the LoRa with high antenna. Number: ";
 }
 
 void loop() {
   heltec_loop();
+
+  if (Serial.available()) {
   
+    txdata = Serial.readStringUntil('\n');
+    both.println("Received from MEGA: " + txdata);
+    radio.clearDio1Action();
+    RADIOLIB(radio.transmit((txdata).c_str()));
+    if (_radiolib_status == RADIOLIB_ERR_NONE) {
+      both.printf("Transmitted: (%s)\n", txdata.c_str()); //convert to C-string
+    } else {
+      both.printf("Transmition failed (%i)\n", _radiolib_status);
+    }
+  }
+
+  /*
   bool tx_legal = millis() > last_tx + minimum_pause;
   if ((PAUSE && tx_legal && millis() - last_tx > (PAUSE * 1000))) {
     
@@ -65,6 +75,7 @@ void loop() {
     minimum_pause = tx_time * 100;
     last_tx = millis();
   }
+  */
 
 }
 

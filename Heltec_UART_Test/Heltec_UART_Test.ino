@@ -6,7 +6,7 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     String msg = Serial.readStringUntil('\n');
-    Serial.print("Echo: ");
+    Serial.print("Sending: ");
     Serial.println(msg);
   }
 }

@@ -52,7 +52,7 @@ void loop() {
     rxFlag = false;
     radio.readData(rxdata);
     if (_radiolib_status == RADIOLIB_ERR_NONE) {
-      both.printf("RX [%s]\n", rxdata.c_str());
+      both.printf("[%s]\n", rxdata.c_str());
     }
   }
 }
