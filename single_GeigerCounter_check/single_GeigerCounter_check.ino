@@ -3,13 +3,13 @@ int count1;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(28, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(28);
+  Serial.begin(115200);
+  pinMode(3, INPUT); Serial.print("Pin mapped as INPUT: "); Serial.println(3);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int value1 = digitalRead(28); //middle
+  int value1 = digitalRead(3); //middle
   if (value1 == 1)
   {
     count1++;

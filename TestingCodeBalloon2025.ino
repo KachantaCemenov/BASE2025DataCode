@@ -104,7 +104,7 @@ void setup() {
    
     
     //filename = "ROOF0703.csv";
-    filename = "FLI02.csv";
+    filename = "0715.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)
