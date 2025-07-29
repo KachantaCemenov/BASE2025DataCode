@@ -78,7 +78,7 @@ void setup() {
     pinMode(smokeInput, INPUT);
     Serial.print("Pin mapped as INPUT: "); Serial.println(smokeInput);
     */
-
+    
     //preparing the SD card:
     if(!SD.begin(10))
     {
@@ -88,7 +88,7 @@ void setup() {
     {
         Serial.println("SD card detected.");
     }
-    
+
     //preparing the MS5607 sensor
     if(!P_Sens.begin())
     {
@@ -99,12 +99,13 @@ void setup() {
 
     //Prepare the ADXL345 accelerometer
     adxl.powerOn();
+    delay(100);
     adxl.setRangeSetting(2);
     Serial.println("ADXL345 initialized");
    
     
     //filename = "ROOF0703.csv";
-    filename = "0715.csv";
+    filename = "0728.csv";
     myFile = SD.open(filename, FILE_WRITE);
     
     if(myFile)

@@ -4,7 +4,7 @@ int count1 = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200); 
-  pinMode(3, INPUT);
+  pinMode(22, INPUT);
 }
 int val1 = 0;
 void loop() {

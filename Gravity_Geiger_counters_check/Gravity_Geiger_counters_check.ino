@@ -58,7 +58,7 @@ void setup(){
     Serial.println("SD card detected.");
   }
 
-  filename = "TEST01.csv";
+  filename = "0729.csv";
   myFile = SD.open(filename, FILE_WRITE);
   if(myFile)
   {
